@@ -1,0 +1,68 @@
+name: workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Lint code
+        run: echo "Linting repository"
+
+      - name: Run unit tests
+        run: echo "Running unit tests"
+
+  build:
+    name: Build and Deliver
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
+
+      - name: Build Docker image
+        run: |
+          docker build -t my-app:latest .
+
+      - name: Push Docker image to Docker Hub (or other registry)
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker tag my-app:latest my-docker-username/my-app:latest
+          docker push my-docker-username/my-app:latest
+
+  Continuous-Deployment:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker pull my-docker-username/my-app:latest
+
+      - name: Run Docker Image
+        run: |
+          docker run -d -p 8080:8080 --name=mlproj my-docker-username/my-app:latest
+
+      - name: Clean previous images and containers
+        run: |
+          docker system prune -f
