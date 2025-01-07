@@ -40,13 +40,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t Machine-Learning-Project-With-MLflow:latest .
+          docker build -t machine-learning-project-with-mlflow:latest .
 
       - name: Push Docker image to Docker Hub (or other registry)
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker tag Machine-Learning-Project-With-MLflow:latest ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
+          docker tag machine-learning-project-with-mlflow:latest ${{ secrets.DOCKER_USERNAME }}/machine-learning-project-with-mlflow:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/machine-learning-project-with-mlflow:latest
 
   Continuous-Deployment:
     needs: build
@@ -57,11 +57,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/machine-learning-project-with-mlflow:latest
 
       - name: Run Docker Image
         run: |
-          docker run -d -p 8080:8080 --name=mlproj ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
+          docker run -d -p 8080:8080 --name=mlproj ${{ secrets.DOCKER_USERNAME }}/machine-learning-project-with-mlflow:latest
 
       - name: Clean previous images and containers
         run: |
