@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Lint code
-        run: echo "Linting repository"
+        run: echo "Linking repository"
 
       - name: Run unit tests
         run: echo "Running unit tests"
@@ -40,13 +40,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my-app:latest .
+          docker build -t Machine-Learning-Project-With-MLflow:latest .
 
       - name: Push Docker image to Docker Hub (or other registry)
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker tag my-app:latest my-docker-username/my-app:latest
-          docker push my-docker-username/my-app:latest
+          docker tag Machine-Learning-Project-With-MLflow:latest ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
 
   Continuous-Deployment:
     needs: build
@@ -57,11 +57,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker pull my-docker-username/my-app:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
 
       - name: Run Docker Image
         run: |
-          docker run -d -p 8080:8080 --name=mlproj my-docker-username/my-app:latest
+          docker run -d -p 8080:8080 --name=mlproj ${{ secrets.DOCKER_USERNAME }}/Machine-Learning-Project-With-MLflow:latest
 
       - name: Clean previous images and containers
         run: |
